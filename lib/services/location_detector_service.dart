@@ -14,11 +14,12 @@ class LocationDetectorService {
 
   // 从 Exif 数据中提取位置信息
   String extractLocationFromExif(Map<String, IfdTag> tags) {
-    if (tags.containsKey('GPS GPSLatitude') && tags.containsKey('GPS GPSLongitude')) {
-      var latValues = tags['GPS GPSLatitude']?.values.toList().cast<double>();
-      var lonValues = tags['GPS GPSLongitude']?.values.toList().cast<double>();
-      var latRef = tags['GPS GPSLatitudeRef']?.printable;
-      var lonRef = tags['GPS GPSLongitudeRef']?.printable;
+    // 检查 GPS 标签
+    if (tags.containsKey('GPSLatitude') && tags.containsKey('GPSLongitude')) {
+      var latValues = tags['GPSLatitude']?.values.toList().cast<double>();
+      var lonValues = tags['GPSLongitude']?.values.toList().cast<double>();
+      var latRef = tags['GPSLatitudeRef']?.printable;
+      var lonRef = tags['GPSLongitudeRef']?.printable;
 
       if (latValues != null && lonValues != null && latRef != null && lonRef != null) {
         double latitude = _convertToDegrees(latValues);
@@ -26,14 +27,13 @@ class LocationDetectorService {
 
         if (latRef == "S") latitude = -latitude;
         if (lonRef == "W") longitude = -longitude;
-        location = '纬度: $latitude, 经度: $longitude';
+        return '纬度: $latitude, 经度: $longitude';
       } else {
-          location = "未找到 GPS 信息";
+        return "未找到 GPS 信息";
       }
     } else {
-      location = "未找到 GPS 信息";
+      return "未找到 GPS 信息";
     }
-    return location;
   }
 
   // 转换经纬度格式
